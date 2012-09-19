@@ -1,3 +1,4 @@
+<div class="data">
 	<div class="arrow"></div>
 	<h3 class="popover-title"><?php print $term->name ?></h3>
 	<div class="popover-content">
@@ -5,4 +6,4 @@
 			<?php print theme('node', $node); ?>
 		<?php endforeach; ?>
 	</div>          
-
+</div>
