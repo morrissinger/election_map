@@ -5,7 +5,7 @@ $(document).ready(function(){
 		left = event.pageX;
 		$(".popover").css("top", (bottom-($(".popover").height()/2))+"px").css("left", (left+5)+"px").fadeIn("fast");
 		$.get('?q=election_map/request/'+this.id, function(data){
-			$(".popover").empty().prepend(data).height()/2))+"px").css("left", (left+5)+"px");
+			$(".popover").empty().prepend(data).css("top", (bottom-($(".popover").height()/2))+"px").css("left", (left+5)+"px");
 		});
 	}).bind("mouseout", function(event){
 		$(".popover").empty().prepend("<div class=\"throbber\">Loading data...</div>").hide();
