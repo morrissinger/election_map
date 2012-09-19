@@ -130,3 +130,9 @@
 }
 
 /* ... */
+
+/* Custom */
+.popover .throbber {
+	padding: 1em;
+	color: #777;
+}
