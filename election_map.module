@@ -1,0 +1,127 @@
+<?php
+/**
+ * @file Powers the election map via AJAX
+ * 
+ * This module allows a user to define a taxonomy vocabulary to use with various
+ * nodes that correspond with data to chart on a javascript-powered election map.
+ * 
+ * The administrator can create tag an election map image map with a class, and
+ * this module will pull taxonomy terms from the image map via jQuery and poll
+ * a callback within this module to gather election data within a taxonomy term.
+ * 
+ * The data will be themed with a template file, which will allow subsequent uses
+ * of this module to theme the election data as required on a use-by-use basis. The
+ * template file will theme a popover.
+ */
+ 
+// \defgroup drupal_hooks Drupal Hooks
+// @{
+	
+ /**
+  * Implementation of hook_menu().
+  * 
+  * Creates a settings page, an callback for requests via AJAX, and
+  * a JavaScript file.
+  */
+function election_map_menu() {
+	$items = array();
+	
+	// System Settings Form
+	$items['admin/settings/election_map'] = array(
+		'title' => 'Election Map',
+		'description' => 'Control how your site queries data for election maps.',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('election_map_admin_settings'),
+		'access arguments' => array('administer site configuration'),
+		'file' => 'election_map.admin.inc',
+	);
+	
+	// AJAX Request Handler
+	$items['election_map/request/%'] = array(
+		'access arguments' => array('access content'),
+		'page arguments' => array(2), 
+		'page callback' => 'election_map_get', 
+		'type' => MENU_CALLBACK, 
+	);
+
+	// Javascript file
+	$items['election_map/election_map.js'] = array(
+		'access arguments' => array('access content'),
+		'page callback' => 'election_map_js', 
+		'file' => 'election_map.js.inc', 
+		'type' => MENU_CALLBACK, 
+	);
+	
+	return $items;
+}
+
+/**
+  * Implementation of hook_theme().
+  * 
+  * Registers theme callbacks.
+  */
+function election_map_theme() {
+	return array(
+		'election_map_popover' => array(
+			'arguments' => array('nodes' => NULL, 'term' => NULL), 
+			'file' => 'election_map.theme.inc', 
+			'template' => 'election_map_popover',
+		),
+	);
+}
+// @}
+
+// \defgroup theme Themers
+// @{
+
+/**
+ * Theme an election data popover.
+ */	
+
+// @}
+	
+// \defgroup menu_callbacks Menu Callbacks
+// @{
+	
+/**
+ * Handle a request for election data via AJAX.
+ */
+function election_map_get($tid) {
+	if ($term = taxonomy_get_term($tid)) {
+		$nodes = election_map_get_nodes($term);
+		echo theme('election_map_popover', $nodes, $term);
+	}
+}
+
+// @}
+
+// \defgroup helpers Helper Functions
+// @{
+	
+/**
+ * Retrieve a list of nodes tagged with a given term.
+ */
+function election_map_get_nodes($term) {
+	$nodes = array();
+	$qs = db_query("SELECT n.nid FROM {node} n INNER JOIN term_node {tn} ON n.nid = tn.nid WHERE tn.tid = %d", $term->tid);
+	while ($object = db_fetch_object($qs)) {
+		$nodes[$object->nid] = node_load($object->nid);
+	}
+	return $nodes;
+}
+
+/**
+ * Add necessary css and js.
+ */
+function election_map_add_css_js() {
+	drupal_add_js('misc/jquery.js', 'core');
+	drupal_add_js(drupal_get_path('module', 'election_map') . '/election_map.js');
+	drupal_add_css(drupal_get_path('module', 'election_map') .'/popover.css');
+}
+
+function z($array) {
+	print "<pre>";
+	print_r($array);
+	print "</pre>";
+}
+// @}

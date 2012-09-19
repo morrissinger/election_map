@@ -1,0 +1,4 @@
+name = Election Map
+description = Powers the election map via AJAX
+core = 6.x
+version = 1.0
