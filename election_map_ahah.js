@@ -17,10 +17,13 @@ $(document).ready(function(){
 	
 	
 	$(".electionmap area.region").bind("mouseover", function(event){
-		bottom = event.pageY;
-		left = event.pageX;
-		$(".popover-"+this.id).css("top", (bottom-($(".popover-"+this.id).height()/2))+"px").css("left", (left+5)+"px").fadeIn("fast").children(".throbber").hide();
+		$(".popover-"+this.id).fadeIn("fast").children(".throbber").hide();
+		$(".electionmap area.region").mousemove(function(event){
+			bottom = event.pageY;
+			left = event.pageX;
+			$(".popover-"+this.id).css("top", (bottom-($(".popover-"+this.id).height()/2))+"px").css("left", (left+5)+"px");
+		});
 	}).bind("mouseout", function(event){
 		$(".popover-"+this.id).hide();
-	});	
+	});
 });
