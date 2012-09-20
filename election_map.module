@@ -86,11 +86,25 @@ function election_map_theme() {
 /**
  * Handle a request for election data via AJAX.
  */
-function election_map_get($tid) {
-	if ($term = taxonomy_get_term($tid)) {
+function election_map_get($tids) {
+	$nodes = election_map_get_nodes(json_decode($tids));
+
+	$output = "";
+	
+	foreach ($nodes as $tid => $nodes) {
+		if ($term = taxonomy_get_term($tid)) {
+			$output .= theme('election_map_popover', $nodes, $term);
+		}
+	}
+
+	echo $output;
+
+/*	if ($term = taxonomy_get_term($tid)) {
 		$nodes = election_map_get_nodes($term);
 		echo theme('election_map_popover', $nodes, $term);
 	}
+ */
+ 
 }
 
 // @}
@@ -101,11 +115,14 @@ function election_map_get($tid) {
 /**
  * Retrieve a list of nodes tagged with a given term.
  */
-function election_map_get_nodes($term) {
+function election_map_get_nodes($tids) {
+	if (!is_array($tids)) {
+		$tids = array($tids);
+	}
 	$nodes = array();
-	$qs = db_query("SELECT n.nid FROM {node} n INNER JOIN term_node {tn} ON n.nid = tn.nid WHERE tn.tid = %d", $term->tid);
+	$qs = db_query("SELECT n.nid, tn.tid AS tid FROM {node} n INNER JOIN term_node {tn} ON n.nid = tn.nid WHERE tn.tid IN (%s)", implode(', ', $tids));
 	while ($object = db_fetch_object($qs)) {
-		$nodes[$object->nid] = node_load($object->nid);
+		$nodes[$object->tid][$object->nid] = node_load($object->nid);
 	}
 	return $nodes;
 }
