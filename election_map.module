@@ -113,9 +113,13 @@ function election_map_get_nodes($term) {
 /**
  * Add necessary css and js.
  */
-function election_map_add_css_js() {
+function election_map_add_css_js($ahah = false) {
 	drupal_add_js('misc/jquery.js', 'core');
-	drupal_add_js(drupal_get_path('module', 'election_map') . '/election_map.js');
+	if ($ahah) {
+		drupal_add_js(drupal_get_path('module', 'election_map'). '/election_map_ahah.js');
+	} else {
+		drupal_add_js(drupal_get_path('module', 'election_map'). '/election_map.js');	
+	}
 	drupal_add_css(drupal_get_path('module', 'election_map') .'/popover.css');
 }
 
